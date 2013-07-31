@@ -188,6 +188,10 @@
 		2C4012D917A7CEE800702286 /* IntroLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C4012D817A7CEE800702286 /* IntroLayer.mm */; };
 		2C4012DC17A7CEE800702286 /* GLES-Render.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C4012DB17A7CEE800702286 /* GLES-Render.mm */; };
 		2C4012DE17A7CEE800702286 /* blocks.png in Resources */ = {isa = PBXBuildFile; fileRef = 2C4012DD17A7CEE800702286 /* blocks.png */; };
+		2C40137117A7D6C100702286 /* road_bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 2C40136F17A7D6C100702286 /* road_bg.png */; };
+		2C40137217A7D6C100702286 /* road_fg.png in Resources */ = {isa = PBXBuildFile; fileRef = 2C40137017A7D6C100702286 /* road_fg.png */; };
+		2C40137517A7D6CB00702286 /* taxi.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2C40137317A7D6CB00702286 /* taxi.plist */; };
+		2C40137617A7D6CB00702286 /* taxi.png in Resources */ = {isa = PBXBuildFile; fileRef = 2C40137417A7D6CB00702286 /* taxi.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -569,6 +573,10 @@
 		2C4012DA17A7CEE800702286 /* GLES-Render.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GLES-Render.h"; sourceTree = "<group>"; };
 		2C4012DB17A7CEE800702286 /* GLES-Render.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "GLES-Render.mm"; sourceTree = "<group>"; };
 		2C4012DD17A7CEE800702286 /* blocks.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = blocks.png; path = Resources/blocks.png; sourceTree = "<group>"; };
+		2C40136F17A7D6C100702286 /* road_bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = road_bg.png; sourceTree = "<group>"; };
+		2C40137017A7D6C100702286 /* road_fg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = road_fg.png; sourceTree = "<group>"; };
+		2C40137317A7D6CB00702286 /* taxi.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = taxi.plist; sourceTree = "<group>"; };
+		2C40137417A7D6CB00702286 /* taxi.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = taxi.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -647,6 +655,10 @@
 		2C4010AE17A7CEE500702286 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				2C40137317A7D6CB00702286 /* taxi.plist */,
+				2C40137417A7D6CB00702286 /* taxi.png */,
+				2C40136F17A7D6C100702286 /* road_bg.png */,
+				2C40137017A7D6C100702286 /* road_fg.png */,
 				2C4010AF17A7CEE500702286 /* Default.png */,
 				2C4010B117A7CEE500702286 /* Default@2x.png */,
 				2C4010B317A7CEE500702286 /* Default-568h@2x.png */,
@@ -1248,6 +1260,10 @@
 				2C4010C517A7CEE500702286 /* iTunesArtwork in Resources */,
 				2C40121E17A7CEE700702286 /* ChangeLog in Resources */,
 				2C4012DE17A7CEE800702286 /* blocks.png in Resources */,
+				2C40137117A7D6C100702286 /* road_bg.png in Resources */,
+				2C40137217A7D6C100702286 /* road_fg.png in Resources */,
+				2C40137517A7D6CB00702286 /* taxi.plist in Resources */,
+				2C40137617A7D6CB00702286 /* taxi.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
