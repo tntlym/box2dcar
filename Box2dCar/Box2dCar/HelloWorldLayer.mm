@@ -37,6 +37,8 @@ enum {
     b2Body *wheelFront;
     b2Body *wheelRear;
     
+    CCSprite *taxiSprite;
+    
     bool pressedLeft;
 	bool pressedRight;
 }
@@ -75,7 +77,8 @@ enum {
 		CGSize s = [CCDirector sharedDirector].winSize;
         
         gameNode = [[CCNode alloc] init];
-        [self addChild:gameNode];
+        gameNode.position = ccp(0,0);
+        [self addChild:gameNode z:1];
         
         [self initMyPhysics];
 		
@@ -175,8 +178,10 @@ enum {
 	[self addChild: menu z:-1];	
 }
 
+
 -(void) initMyPhysics
 {
+    
     CGSize s = [[CCDirector sharedDirector] winSize];
     
     // Create the world
@@ -208,6 +213,7 @@ enum {
 	groundBodyDef.position.Set(0, 0);
 	b2Body *body = world->CreateBody(&groundBodyDef);
     
+    
     b2EdgeShape groundBox;
 	
 	b2FixtureDef groundFixtureDef;
@@ -216,48 +222,26 @@ enum {
 	groundFixtureDef.filter.categoryBits = CB_GROUND;
 	groundFixtureDef.filter.maskBits = CB_CAR | CB_WHEEL;
     
-	groundBox.Set(b2Vec2(-960/PTM_RATIO,0), b2Vec2(-960/PTM_RATIO,200/PTM_RATIO));
+	groundBox.Set(b2Vec2(-s.width/PTM_RATIO,0), b2Vec2(-s.width/PTM_RATIO,s.height/PTM_RATIO));
 	groundFixtureDef.shape = &groundBox;
 	body->CreateFixture(&groundFixtureDef);
 	
-	groundBox.Set(b2Vec2(960/PTM_RATIO,0), b2Vec2(960/PTM_RATIO,200/PTM_RATIO));
+	groundBox.Set(b2Vec2(s.width*2/PTM_RATIO,0), b2Vec2(s.width*2/PTM_RATIO,s.height/PTM_RATIO));
 	groundFixtureDef.shape = &groundBox;
 	body->CreateFixture(&groundFixtureDef);
-    
-    /*
-	float32 x1; float32 y1;
-	for(int u = -1; u < 2; u++){
-		//Add Edge Shapes
-		x1 = -15.0f;
-		y1 = 2.0f * cosf(x1 / 10.0f * b2_pi);
-		for (int32 i = 0; i < 60; ++i)
-		{
-			float32 x2 = x1 + 0.5f;
-			float32 y2 = 2.0f * cosf(x2 / 10.0f * b2_pi);
-            
-			b2EdgeShape shape;
-			shape.Set(b2Vec2(x1 + u*960/PTM_RATIO, y1), b2Vec2(x2 + u*960/PTM_RATIO, y2));
-			body->CreateFixture(&shape, 0.0f);
-            
-			x1 = x2;
-			y1 = y2;
-		}
-		
-		//Add corresponding graphics
-		CCSprite *bg = [CCSprite spriteWithFile:@"road_bg.png"];
-		bg.position = ccp(u*960,70);
-		[gameNode addChild:bg z:0];
-        
-		CCSprite *fg = [CCSprite spriteWithFile:@"road_fg.png"];
-		fg.position = ccp(u*960,70);
-		[gameNode addChild:fg z:2];
-	}*/
-    
+
     b2EdgeShape groundEdge;
-    groundEdge.Set(b2Vec2(0.0f, 0.0f), b2Vec2(s.width*0.5/PTM_RATIO, 0));
+    
+    groundEdge.Set(b2Vec2(-s.width, 0.0f), b2Vec2(0.0f, 0.0f));
+    body->CreateFixture(&groundEdge, 0.0f);
+    
+    groundEdge.Set(b2Vec2(0.0f, 0.0f), b2Vec2(s.width*0.5/PTM_RATIO, 0.0f));
     body->CreateFixture(&groundEdge, 0.0f);
     
     groundEdge.Set(b2Vec2(s.width*0.5/PTM_RATIO, 0.0f), b2Vec2(s.width/PTM_RATIO, 100/PTM_RATIO));
+    body->CreateFixture(&groundEdge, 0.0f);
+    
+    groundEdge.Set(b2Vec2(s.width/PTM_RATIO, 100/PTM_RATIO), b2Vec2(s.width*2/PTM_RATIO, 0.0f));
     body->CreateFixture(&groundEdge, 0.0f);
 
 
@@ -342,16 +326,31 @@ enum {
 -(void) addNewSpriteAtPosition:(CGPoint)p
 {
     if (taxiBody == NULL) {
-        CCLOG(@"Add sprite %0.2f x %02.f",p.x,p.y);
+        
+        CGSize s = [CCDirector sharedDirector].winSize;
+
+        
+        CGPoint taxiPosition = ccp(40, 40);
+        
+        CCLOG(@"Add sprite to %0.2f x %02.f",p.x,p.y);
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"taxi.plist"];
 
         float taxiScale = 0.2f;
+        
+        taxiSprite = [CCSprite spriteWithSpriteFrameName:@"taxi_main.png"];
+        taxiSprite.anchorPoint = ccp(0, 0);
+        //taxiSprite.position = ccp(p.x, p.y);
+        taxiSprite.position = ccp (taxiPosition.x/PTM_RATIO, taxiPosition.y/PTM_RATIO);
+        taxiSprite.scale = taxiScale;
+        [gameNode addChild:taxiSprite z:100];
         
         // Define the dynamic body.
         //Set up a 1m squared box in the physics world
         b2BodyDef bodyDef;
         bodyDef.type = b2_dynamicBody;
-        bodyDef.position.Set(p.x/PTM_RATIO, p.y/PTM_RATIO);
+        //bodyDef.position.Set(p.x/PTM_RATIO, p.y/PTM_RATIO);
+        bodyDef.position.Set(taxiPosition.x/PTM_RATIO, taxiPosition.y/PTM_RATIO);
+        bodyDef.userData = taxiSprite;
         taxiBody = world->CreateBody(&bodyDef);
         
         b2FixtureDef taxiFixtureDef;
@@ -383,13 +382,28 @@ enum {
         
         // add wheels
         //CGPoint wheelPosition[] = { ccp(p.x/PTM_RATIO + 16, p.y/PTM_RATIO), ccp(p.x/PTM_RATIO + 43, p.y/PTM_RATIO) };
-        CGPoint wheelPosition[] = { ccp((p.x+16)/PTM_RATIO , p.y/PTM_RATIO), ccp((p.x+43)/PTM_RATIO , p.y/PTM_RATIO) };
+        //CGPoint wheelPosition[] = { ccp((p.x+16) , p.y), ccp((p.x+43) , p.y) };
+        CGPoint wheelPosition[] = { ccp((taxiPosition.x+16) , taxiPosition.y), ccp((taxiPosition.x+43) , taxiPosition.y) };
 
         
         for(int i=0; i<2; i++){
+            
+            CGPoint textureSize = ccp(52, 51);
+            CGPoint shapeSize = ccp(9,9);
+            
+            CCSprite *wheelSprite = [CCSprite spriteWithSpriteFrameName:@"taxi_wheel.png"];
+            
+            wheelSprite.position = ccp(wheelPosition[i].x, wheelPosition[i].y);
+            wheelSprite.scaleX = shapeSize.x / textureSize.y * 2;
+            wheelSprite.scaleY = shapeSize.y / textureSize.y * 2;
+            
+            [gameNode addChild:wheelSprite z:100];
+            
             b2BodyDef wheelBodyDef;
             wheelBodyDef.type = b2_dynamicBody;
-            wheelBodyDef.position.Set(wheelPosition[i].x, wheelPosition[i].y);
+            wheelBodyDef.position.Set(wheelPosition[i].x/PTM_RATIO, wheelPosition[i].y/PTM_RATIO);
+            
+            wheelBodyDef.userData = wheelSprite;
 
             b2Body *wheel = world->CreateBody(&wheelBodyDef);
 
@@ -400,7 +414,7 @@ enum {
                 wheelFront = wheel;
             }
             
-            wheel->SetTransform(b2Vec2(wheelPosition[i].x, wheelPosition[i].y),3.14159/2);
+            wheel->SetTransform(b2Vec2(wheelPosition[i].x/PTM_RATIO, wheelPosition[i].y/PTM_RATIO),3.14159/2);
 
 
             b2FixtureDef wheelFixtureDef;
@@ -410,7 +424,8 @@ enum {
             wheelFixtureDef.friction = 10.0f;
             wheelFixtureDef.restitution = 0.0f;
             
-            CGPoint shapeSize = ccp(9,9);
+
+            
 
             b2CircleShape *wheelCircleShape = new b2CircleShape();
             
@@ -418,7 +433,7 @@ enum {
                 wheelCircleShape->m_radius = shapeSize.x/PTM_RATIO;
 
             } else {
-                wheelCircleShape->m_radius = shapeSize.x*2/PTM_RATIO;
+                wheelCircleShape->m_radius = shapeSize.x/PTM_RATIO;
             }
             
             wheelFixtureDef.shape = wheelCircleShape;
@@ -430,7 +445,7 @@ enum {
             b2RevoluteJointDef rjd;
             b2RevoluteJoint* joint;
             
-            rjd.Initialize(wheel, taxiBody, b2Vec2(wheelPosition[i].x, wheelPosition[i].y));
+            rjd.Initialize(wheel, taxiBody, b2Vec2(wheelPosition[i].x/PTM_RATIO, wheelPosition[i].y/PTM_RATIO));
             joint = (b2RevoluteJoint*)world->CreateJoint(&rjd);
         }
          
@@ -448,7 +463,7 @@ enum {
 	if(point.x < 240){
 		pressedLeft = YES; pressedRight = NO;
 	}else if(point.x >= 240){
-        world->SetGravity(b2Vec2(0.0f, 0.5f));
+        //world->SetGravity(b2Vec2(0.0f, 0.5f));
 		pressedRight = YES; pressedLeft = NO;
 	}
     
@@ -482,6 +497,7 @@ enum {
 
 -(void) update: (ccTime) dt
 {
+
     
 	//It is recommended that a fixed time step is used with Box2D for stability
 	//of the simulation, however, we are using a variable time step here.
@@ -489,14 +505,29 @@ enum {
 	//http://gafferongames.com/game-physics/fix-your-timestep/
 	
 	int32 velocityIterations = 8;
-	int32 positionIterations = 1;
+	int32 positionIterations = 3;
 	
 	// Instruct the world to perform a single step of simulation. It is
 	// generally best to keep the time step and iterations fixed.
 	world->Step(dt, velocityIterations, positionIterations);
     
+
+    
     //We apply some counter-torque to steady the car
     if (wheelFront != nil && wheelRear != nil) {
+        
+        //Set sprite positions by body positions
+        for (b2Body* b = world->GetBodyList(); b; b = b->GetNext())
+        {
+            if (b->GetUserData() != NULL) {
+                CCSprite *tmp = (CCSprite*)b->GetUserData();
+                [tmp setPosition:CGPointMake( b->GetPosition().x * PTM_RATIO, b->GetPosition().y * PTM_RATIO)];
+                tmp.rotation = -1 * CC_RADIANS_TO_DEGREES(b->GetAngle());
+            }
+        }
+        
+        gameNode.position = ccp(-taxiSprite.position.x + 240, -taxiSprite.position.y + 160);
+
         if(pressedRight){
             wheelFront->ApplyTorque(-100.0f);
             taxiBody->ApplyTorque(5.0f);
